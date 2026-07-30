@@ -16,7 +16,10 @@ def analyse_commit():
 commit message:"{message}"
 Diff:
 {diff}
-Judge whether the commit message accurately describes the diff, and whether the message follows good commit message conventions (clear, descriptive, imperative mood). Give a short verdict and 1-2 sentences of reasoning."""
+Judge whether the commit message accurately describes the diff, and whether the message follows good commit message conventions (clear, descriptive, imperative mood).
+Respond in EXACTLY this format nothing else:
+VERDICT: PASS OR VERDICT: FAIL
+REASON:one or two sentences of reasoning"""
     response=llm.invoke(prompt)
     if isinstance(response.content,list):
         return "".join(

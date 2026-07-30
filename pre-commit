@@ -1,0 +1,15 @@
+import sys  #gives system.exit (accept, reject)
+import os   #to build a path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from analyse import analyse_commit  #calls the analyse function 
+if __name__ == "__main__":  #if name is run with same fuiename run
+    verdict=analyse_commit()
+    print(verdict)
+
+    if "FAIL" in verdict.upper():
+        print("Commit is blocked by linter\n")
+        sys.exit(1) #msg appeared and exit executed coz 1
+    
+    else:
+        sys.exit(0)
+        

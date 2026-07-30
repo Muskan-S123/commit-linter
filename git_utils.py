@@ -1,7 +1,7 @@
 import subprocess
 def get_git_diff():
     result=subprocess.run(
-        ["git","diff","--stagged"],
+        ["git","diff","--staged"],
         capture_output=True,
         text=True
     )
