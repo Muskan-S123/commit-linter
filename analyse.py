@@ -3,9 +3,12 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from git_utils import get_git_diff, get_commit_message
 load_dotenv()
-def analyse_commit():
-    diff=get_git_diff()
-    message=get_commit_message()
+def analyse_commit(diff:str|None=None, message:str|None=None):
+    if diff is None:
+        diff=get_git_diff()
+    if message is None:
+        message=get_commit_message()
+
     if not diff:
         return "No changes to analyze"
     llm=ChatGoogleGenerativeAI(
