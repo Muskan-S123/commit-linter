@@ -16,3 +16,4 @@ def health():
 def analyse(input: CommitInput):
     result = analyse_commit(input.diff, input.message)
     return {"verdict": result}
+#testing the diff
