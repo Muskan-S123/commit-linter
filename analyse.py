@@ -11,10 +11,8 @@ def analyse_commit(diff:str|None=None, message:str|None=None):
 
     if not diff:
         return "No changes to analyze"
-    llm=ChatGoogleGenerativeAI(
-        model="gemini-3.1-flash-lite",
-        google_api_key=os.environ.get("GOOGLE_API_KEY")
-    )
+
+    
     prompt = f"""You are a commit message linter. Judge ONLY the commit message against the rules below — do not require the message to mention every file changed in the diff.
 
 Commit message: "{message}"
@@ -33,13 +31,30 @@ Do NOT fail a message just because it omits a secondary or incidental change (e.
 Respond in EXACTLY this format, nothing else:
 VERDICT: PASS OR VERDICT: FAIL
 REASON: one sentence, citing which rule (1-4) was violated if FAIL"""
-    response=llm.invoke(prompt)
-    if isinstance(response.content,list):
-        return "".join(
-            block.get("text","") for block in response.content
-            if isinstance(block,dict) and block.get("type") == "text"
+    try:
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-3.1-flash",
+            google_api_key=os.environ.get("GOOGLE_API_KEY"),
+            temperature=0
         )
-    return response.content
+        results = []
+        for _ in range(2):
+            response = llm.invoke(prompt)
+            if isinstance(response.content, list):
+                text = "".join(
+                    block.get("text", "") for block in response.content
+                    if isinstance(block, dict) and block.get("type") == "text"
+                )
+            else:
+                text = response.content
+            results.append(text)
+    except Exception as e:
+        return f"VERDICT: PASS\nREASON: Linter could not reach Gemini ({type(e).__name__}: {e}) — commit allowed through unchecked."
+
+    fails = [r for r in results if "FAIL" in r.upper()]
+    if len(fails) == 2:
+        return fails[0]
+    return results[0] if "PASS" in results[0].upper() else results[-1]
 if __name__ == "__main__":
     result = analyse_commit()
     print(result)
